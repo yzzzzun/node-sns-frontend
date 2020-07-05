@@ -10,12 +10,13 @@ export const initialState = {
       content: "첫 번째 게시글 #해시태그 #익스프레스",
       Images: [
         {
-          src:
-            "https://interactive-examples.mdn.mozilla.net/media/examples/grapefruit-slice-332-332.jpg"
+          src: "https://gimg.gilbut.co.kr/book/BN002496/rn_view_BN002496.jpg"
         },
         {
-          src:
-            "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__340.jpg"
+          src: "https://gimg.gilbut.co.kr/book/BN002496/rn_view_BN002496.jpg"
+        },
+        {
+          src: "https://gimg.gilbut.co.kr/book/BN002496/rn_view_BN002496.jpg"
         }
       ],
       Comments: [
