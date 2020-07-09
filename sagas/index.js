@@ -1,56 +1,7 @@
-import {
-  all,
-  fork,
-  call,
-  take,
-  put,
-  takeEvery,
-  delay,
-  takeLatest
-} from "redux-saga/effects";
+import { all, fork } from "redux-saga/effects";
 
-function loginAPI(data) {
-  //실제 서버 요청
-  return axios.post("/api/login", data);
-}
-function logoutAPI() {
-  //실제 서버 요청
-  return axios.post("/api/logout");
-}
-function addPostAPI() {
-  //실제 서버 요청
-  return axios.post("/api/post");
-}
-//yield를 붙이는 이유는 테스트하기 편해서!!
-function* logIn(action) {
-  try {
-    yield delay(2000);
-    // const result = yield call(loginAPI, action.data);
-    yield put({ type: "LOG_IN_SUCCESS", data: result.data });
-  } catch (error) {
-    yield put({ type: "LOG_IN_FAILURE", data: error.response.data });
-  }
-}
-
-function* logOut() {
-  try {
-    // const result = yield call(logoutAPI);
-    yield delay(2000);
-    yield put({ type: "LOG_OUT_SUCCESS", data: result.data });
-  } catch (error) {
-    yield put({ type: "LOG_OUT_FAILURE", data: error.response.data });
-  }
-}
-
-function* addPost() {
-  try {
-    // const result = yield call(addPostAPI);
-    yield delay(2000);
-    yield put({ type: "ADD_POST_SUCCESS", data: result.data });
-  } catch (error) {
-    yield put({ type: "ADD_POST_FAILURE", data: error.response.data });
-  }
-}
+import postSaga from "./post";
+import userSaga from "./user";
 
 /**
  * 동기로 수행
@@ -70,16 +21,6 @@ function* addPost() {
  * throttle vs debounce
  */
 
-function* watchLogin() {
-  yield takeLatest("LOG_IN_REQUEST", logIn); //로그인 액션이 실행될때까지 기다리겠다.
-}
-function* watchLogOut() {
-  yield takeLatest("LOG_OUT_REQUEST", logOut);
-}
-function* watchAddPost() {
-  yield takeLatest("ADD_POST_REQUEST", addPost);
-}
-
 export default function* rootSaga() {
-  yield all([fork(watchLogin), fork(watchLogOut), fork(watchAddPost)]); //fork or all 차이 : fork는 비동기 call 동기
+  yield all([fork(postSaga), fork(userSaga)]); //fork or all 차이 : fork는 비동기 call 동기
 }
