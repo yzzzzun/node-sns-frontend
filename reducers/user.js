@@ -1,13 +1,17 @@
+/** 변경중, 완료, 오류 */
 export const initialState = {
   logInLoading: false,
-  logInDone: false, // login 시도중
-  logInError: false, //logout 시도중
+  logInDone: false,
+  logInError: false,
   logOutLoading: false,
-  logOutDone: false, // logout 시도중
-  logOutError: false, //logout 시도중
+  logOutDone: false,
+  logOutError: false,
   signUpLoading: false,
-  signUpDone: false, // logout 시도중
-  signUpError: false, //logout 시도중
+  signUpDone: false,
+  signUpError: false,
+  changeNicknameLoading: false,
+  changeNicknameDone: false,
+  changeNicknameError: false,
   me: null,
   signUpData: {},
   loginData: {}
@@ -24,6 +28,10 @@ export const LOG_OUT_FAILURE = "LOG_OUT_FAILURE";
 export const SIGNUP_REQUEST = "SIGNUP_REQUEST";
 export const SIGNUP_SUCCESS = "SIGNUP_SUCCESS";
 export const SIGNUP_FAILURE = "SIGNUP_FAILURE";
+
+export const CHANGE_NICKNAME_REQUEST = "CHANGE_NICKNAME_REQUEST";
+export const CHANGE_NICKNAME_SUCCESS = "CHANGE_NICKNAME_SUCCESS";
+export const CHANGE_NICKNAME_FAILURE = "CHANGE_NICKNAME_FAILURE";
 
 export const FOLLOW_REQUEST = "FOLLOW_REQUEST";
 export const FOLLOW_SUCCESS = "FOLLOW_SUCCESS";
@@ -96,7 +104,7 @@ const reducer = (state = initialState, action) => {
         logOutLoading: false,
         logOutError: action.error
       };
-    case SIGNUP_SUCCESS:
+    case SIGNUP_REQUEST:
       return {
         ...state,
         signUpLoading: true,
@@ -114,6 +122,25 @@ const reducer = (state = initialState, action) => {
         ...state,
         signUpLoading: false,
         signUpError: action.error
+      };
+    case CHANGE_NICKNAME_REQUEST:
+      return {
+        ...state,
+        changeNicknameLoading: true,
+        changeNicknameDone: false,
+        changeNicknameError: null
+      };
+    case CHANGE_NICKNAME_SUCCESS:
+      return {
+        ...state,
+        changeNicknameLoading: false,
+        changeNicknameDone: false
+      };
+    case CHANGE_NICKNAME_FAILURE:
+      return {
+        ...state,
+        changeNicknameLoading: false,
+        changeNicknameError: action.error
       };
     default:
       return state;
