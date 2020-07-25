@@ -7,7 +7,7 @@ import {
   HeartOutlined,
   HeartTwoTone,
   MessageOutlined,
-  EllipsisOutlined
+  EllipsisOutlined,
 } from "@ant-design/icons";
 import { useSelector, useDispatch } from "react-redux";
 import CommentForm from "./CommentForm";
@@ -16,24 +16,24 @@ import { REMOVE_POST_REQUEST } from "../reducers/post";
 const PostCard = ({ post }) => {
   const [liked, setLiked] = useState(false);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
-  const { me } = useSelector(state => state.user);
-  const { removePostLoading } = useSelector(state => state.post);
+  const { me } = useSelector((state) => state.user);
+  const { removePostLoading } = useSelector((state) => state.post);
   const id = me && me.id;
   const dispatch = useDispatch();
 
   const onToggleLike = useCallback(() => {
-    setLiked(prev => !prev);
+    setLiked((prev) => !prev);
   }, []);
 
   const onToggleComment = useCallback(() => {
-    setCommentFormOpened(prev => !prev);
+    setCommentFormOpened((prev) => !prev);
   }, []);
 
   const onRemovePost = useCallback(() => {
     dispatch({ type: REMOVE_POST_REQUEST, data: post.id });
   }, []);
   return (
-    <div>
+    <div style={{ marginBottom: "20px" }}>
       <Card
         cover={post.Images[0] && <PostImages images={post.Images} />}
         actions={[
@@ -70,7 +70,7 @@ const PostCard = ({ post }) => {
             }
           >
             <EllipsisOutlined />
-          </Popover>
+          </Popover>,
         ]}
       >
         <Card.Meta
@@ -86,7 +86,7 @@ const PostCard = ({ post }) => {
             header={`${post.Comments.length}개의 댓글`}
             itemLayout="horizontal"
             dataSource={post.Comments}
-            renderItem={item => (
+            renderItem={(item) => (
               <li>
                 <Comment
                   author={item.User.nickname}
@@ -109,8 +109,8 @@ PostCard.propTypes = {
     content: PropTypes.string,
     createdAt: PropTypes.object,
     Comments: PropTypes.arrayOf(PropTypes.object),
-    Images: PropTypes.arrayOf(PropTypes.object)
-  }).isRequired
+    Images: PropTypes.arrayOf(PropTypes.object),
+  }).isRequired,
 };
 
 export default PostCard;
