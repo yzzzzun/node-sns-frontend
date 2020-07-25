@@ -41,6 +41,9 @@ export const UNFOLLOW_REQUEST = "UNFOLLOW_REQUEST";
 export const UNFOLLOW_SUCCESS = "UNFOLLOW_SUCCESS";
 export const UNFOLLOW_FAILURE = "UNFOLLOW_FAILURE";
 
+export const ADD_POST_TO_ME = "ADD_POST_TO_ME";
+export const REMOVE_POST_OF_ME = "REMOVE_POST_OF_ME";
+
 export const loginRequest = data => {
   console.log("reducer login");
   return {
@@ -58,9 +61,17 @@ const dummyUser = data => ({
   ...data,
   nickname: "yzzzzun",
   id: 1,
-  Posts: [], // sequalizer 에서 합쳐주기때문에 대문자
-  Followings: [],
-  Followers: []
+  Posts: [{ id: 1 }], // sequalizer 에서 합쳐주기때문에 대문자
+  Followings: [
+    { nickname: "araru" },
+    { nickname: "아라루" },
+    { nickname: "tams" }
+  ],
+  Followers: [
+    { nickname: "araru" },
+    { nickname: "아라루" },
+    { nickname: "tams" }
+  ]
 });
 const reducer = (state = initialState, action) => {
   switch (action.type) {
@@ -141,6 +152,22 @@ const reducer = (state = initialState, action) => {
         ...state,
         changeNicknameLoading: false,
         changeNicknameError: action.error
+      };
+    case ADD_POST_TO_ME:
+      return {
+        ...state,
+        me: {
+          ...state.me,
+          Posts: [{ id: action.data }, ...state.me.Posts]
+        }
+      };
+    case REMOVE_POST_OF_ME:
+      return {
+        ...state,
+        me: {
+          ...state.me,
+          Posts: state.me.Posts.filter(v => v.id !== action.data)
+        }
       };
     default:
       return state;
