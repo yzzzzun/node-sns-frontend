@@ -4,49 +4,12 @@ import faker from "faker";
 
 //서버개발자와 합의를 봐야할 부분들
 export const initialState = {
-  mainPosts: [
-    {
-      id: 1,
-      User: {
-        id: 1,
-        nickname: "yzzzzun",
-      },
-      content: "첫 번째 게시글 #해시태그 #익스프레스",
-      Images: [
-        {
-          id: shortid.generate(),
-          src: "https://gimg.gilbut.co.kr/book/BN002496/rn_view_BN002496.jpg",
-        },
-        {
-          id: shortid.generate(),
-          src: "https://gimg.gilbut.co.kr/book/BN002496/rn_view_BN002496.jpg",
-        },
-        {
-          id: shortid.generate(),
-          src: "https://gimg.gilbut.co.kr/book/BN002496/rn_view_BN002496.jpg",
-        },
-      ],
-      Comments: [
-        {
-          id: shortid.generate(),
-          User: {
-            id: shortid.generate(),
-            nickname: "hero",
-          },
-          content: "저거 내꺼",
-        },
-        {
-          id: shortid.generate(),
-          User: {
-            id: shortid.generate(),
-            nickname: "zeze",
-          },
-          content: "키듴키듴",
-        },
-      ],
-    },
-  ],
+  mainPosts: [],
   imagePaths: [],
+  hasMorePosts: true,
+  loadPostLoading: false,
+  loadPostDone: false,
+  loadPostError: null,
   addPostLoading: false,
   addPostDone: false,
   addPostError: null,
@@ -55,36 +18,39 @@ export const initialState = {
   removePostError: null,
   addCommentLoading: false,
   addCommentDone: false,
-  addCommentError: null,
+  addCommentError: null
 };
 
-initialState.mainPosts = initialState.mainPosts.concat(
-  Array(20)
+export const generateDummyPost = number =>
+  Array(number)
     .fill()
     .map(() => ({
       id: shortid.generate(),
       User: {
         id: shortid.generate(),
-        nickname: faker.name.findName(),
+        nickname: faker.name.findName()
       },
       content: faker.lorem.paragraph(),
       Images: [
         {
           id: shortid.generate(),
-          src: faker.image.image(),
-        },
+          src: faker.image.image()
+        }
       ],
       Comments: [
         {
           User: {
             id: shortid.generate(),
-            nickname: faker.name.findName(),
+            nickname: faker.name.findName()
           },
-          content: faker.lorem.sentence(),
-        },
-      ],
-    }))
-);
+          content: faker.lorem.sentence()
+        }
+      ]
+    }));
+
+export const LOAD_POSTS_REQUEST = "LOAD_POSTS_REQUEST";
+export const LOAD_POSTS_SUCCESS = "LOAD_POSTS_SUCCESS";
+export const LOAD_POSTS_FAILURE = "LOAD_POSTS_FAILURE";
 
 export const ADD_POST_REQUEST = "ADD_POST_REQUEST";
 export const ADD_POST_SUCCESS = "ADD_POST_SUCCESS";
@@ -98,43 +64,42 @@ export const ADD_COMMENT_REQUEST = "ADD_COMMENT_REQUEST";
 export const ADD_COMMENT_SUCCESS = "ADD_COMMENT_SUCCESS";
 export const ADD_COMMENT_FAILURE = "ADD_COMMENT_FAILURE";
 
-export const addPost = (data) => ({ type: ADD_POST_REQUEST, data });
+export const addPost = data => ({ type: ADD_POST_REQUEST, data });
 
-export const addComment = (data) => ({
+export const addComment = data => ({
   type: ADD_COMMENT_REQUEST,
-  data,
+  data
 });
 
-const dummyPost = (data) => ({
+const dummyPost = data => ({
   id: data.id,
   User: {
     id: 1,
-    nickname: "yzzzzun",
+    nickname: "yzzzzun"
   },
   content: data.content,
   Images: [],
-  Comments: [],
+  Comments: []
 });
 
-const dummyComment = (data) => ({
+const dummyComment = data => ({
   id: shortid.generate(),
   content: data,
   User: {
     id: 1,
-    nickname: "yzzzzun",
-  },
+    nickname: "yzzzzun"
+  }
 });
 
 //이전 상태를 액션을 통해 다음상태로 만들어내는 함수(불변성은 지키면서)
 const reducer = (state = initialState, action) => {
-  return produce(state, (draft) => {
+  return produce(state, draft => {
     switch (action.type) {
       case ADD_POST_REQUEST:
         draft.addPostLoading = true;
         draft.addPostDone = false;
         draft.addPostError = null;
         break;
-
       case ADD_POST_SUCCESS:
         draft.mainPosts.unshift(dummyPost(action.data));
         draft.addPostLoading = false;
@@ -144,13 +109,28 @@ const reducer = (state = initialState, action) => {
         draft.addPostLoading = false;
         draft.addPostError = action.error;
         break;
+      case LOAD_POSTS_REQUEST:
+        draft.loadPostLoading = true;
+        draft.loadPostDone = false;
+        draft.loadPostError = null;
+        break;
+      case LOAD_POSTS_SUCCESS:
+        draft.loadPostLoading = false;
+        draft.loadPostDone = true;
+        draft.mainPosts = action.data.concat(draft.mainPosts);
+        draft.hasMorePosts = draft.mainPosts.length < 50;
+        break;
+      case LOAD_POSTS_FAILURE:
+        draft.loadPostLoading = false;
+        draft.loadPostError = action.error;
+        break;
       case REMOVE_POST_REQUEST:
         draft.removePostLoading = true;
         draft.removePostDone = false;
         draft.removePostError = null;
         break;
       case REMOVE_POST_SUCCESS:
-        draft.mainPosts = draft.mainPosts.filter((v) => v.id !== action.data);
+        draft.mainPosts = draft.mainPosts.filter(v => v.id !== action.data);
         draft.removePostLoading = false;
         draft.removePostDone = true;
         break;
@@ -179,7 +159,7 @@ const reducer = (state = initialState, action) => {
         //   addCommentLoading : false,
         //   addCommentDone:true,
         // }
-        const post = draft.mainPosts.find((v) => v.id === action.data.postId);
+        const post = draft.mainPosts.find(v => v.id === action.data.postId);
         post.Comments.unshift(dummyComment(action.data.content));
         draft.addCommentLoading = false;
         draft.addCommentDone = true;
