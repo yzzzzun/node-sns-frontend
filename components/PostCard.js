@@ -7,26 +7,27 @@ import {
   HeartOutlined,
   HeartTwoTone,
   MessageOutlined,
-  EllipsisOutlined,
+  EllipsisOutlined
 } from "@ant-design/icons";
 import { useSelector, useDispatch } from "react-redux";
 import CommentForm from "./CommentForm";
 import { REMOVE_POST_REQUEST } from "../reducers/post";
+import FollowButton from "./FollowButton";
 
 const PostCard = ({ post }) => {
   const [liked, setLiked] = useState(false);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
-  const { me } = useSelector((state) => state.user);
-  const { removePostLoading } = useSelector((state) => state.post);
+  const { me } = useSelector(state => state.user);
+  const { removePostLoading } = useSelector(state => state.post);
   const id = me && me.id;
   const dispatch = useDispatch();
 
   const onToggleLike = useCallback(() => {
-    setLiked((prev) => !prev);
+    setLiked(prev => !prev);
   }, []);
 
   const onToggleComment = useCallback(() => {
-    setCommentFormOpened((prev) => !prev);
+    setCommentFormOpened(prev => !prev);
   }, []);
 
   const onRemovePost = useCallback(() => {
@@ -70,8 +71,9 @@ const PostCard = ({ post }) => {
             }
           >
             <EllipsisOutlined />
-          </Popover>,
+          </Popover>
         ]}
+        extra={id && <FollowButton post={post} />}
       >
         <Card.Meta
           avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
@@ -86,7 +88,7 @@ const PostCard = ({ post }) => {
             header={`${post.Comments.length}개의 댓글`}
             itemLayout="horizontal"
             dataSource={post.Comments}
-            renderItem={(item) => (
+            renderItem={item => (
               <li>
                 <Comment
                   author={item.User.nickname}
@@ -109,8 +111,8 @@ PostCard.propTypes = {
     content: PropTypes.string,
     createdAt: PropTypes.object,
     Comments: PropTypes.arrayOf(PropTypes.object),
-    Images: PropTypes.arrayOf(PropTypes.object),
-  }).isRequired,
+    Images: PropTypes.arrayOf(PropTypes.object)
+  }).isRequired
 };
 
 export default PostCard;

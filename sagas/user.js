@@ -10,7 +10,13 @@ import {
   LOG_OUT_REQUEST,
   SIGNUP_REQUEST,
   SIGNUP_FAILURE,
-  SIGNUP_SUCCESS
+  SIGNUP_SUCCESS,
+  FOLLOW_REQUEST,
+  FOLLOW_SUCCESS,
+  FOLLOW_FAILURE,
+  UNFOLLOW_REQUEST,
+  UNFOLLOW_SUCCESS,
+  UNFOLLOW_FAILURE
 } from "../reducers/user";
 
 function loginAPI(data) {
@@ -24,6 +30,14 @@ function logoutAPI() {
 
 function signupAPI(data) {
   return axios.post("/api/signup", data);
+}
+
+function followAPI(data) {
+  return axios.post("todo");
+}
+
+function unFollowAPI(data) {
+  return axios.post("todo");
 }
 
 function* logIn(action) {
@@ -57,6 +71,26 @@ function* signUp(action) {
   }
 }
 
+function* follow(action) {
+  try {
+    //const result = yield call(signupAPI)
+    yield delay(1000);
+    yield put({ type: FOLLOW_SUCCESS, data: action.data });
+  } catch (error) {
+    yield put({ type: FOLLOW_FAILURE, error: error.response.data });
+  }
+}
+
+function* unFollow(action) {
+  try {
+    //const result = yield call(signupAPI)
+    yield delay(1000);
+    yield put({ type: UNFOLLOW_SUCCESS, data: action.data });
+  } catch (error) {
+    yield put({ type: UNFOLLOW_FAILURE, error: error.response.data });
+  }
+}
+
 function* watchLogin() {
   yield takeLatest(LOG_IN_REQUEST, logIn); //로그인 액션이 실행될때까지 기다리겠다.
 }
@@ -67,6 +101,20 @@ function* watchLogOut() {
 function* watchSignUp() {
   yield takeLatest(SIGNUP_REQUEST, signUp);
 }
+
+function* watchFollow() {
+  yield takeLatest(FOLLOW_REQUEST, follow);
+}
+function* watchUnFollow() {
+  yield takeLatest(UNFOLLOW_REQUEST, unFollow);
+}
+
 export default function* userSaga() {
-  yield all([fork(watchLogin), fork(watchLogOut), fork(watchSignUp)]);
+  yield all([
+    fork(watchLogin),
+    fork(watchLogOut),
+    fork(watchSignUp),
+    fork(watchFollow),
+    fork(watchUnFollow)
+  ]);
 }
