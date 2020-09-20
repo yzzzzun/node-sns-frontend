@@ -1,6 +1,7 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import AppLayout from "../components/AppLayout";
 import Head from "next/head";
+import Router from "next/router";
 import useInput from "../hooks/useInput";
 import { Form, Input, Checkbox, Button } from "antd";
 import styled from "styled-components";
@@ -16,19 +17,42 @@ const Signup = () => {
   const [password, onChangePassword] = useInput("");
   const [passwordCheck, setPasswordCheck] = useState("");
   const [passwordError, setPasswordError] = useState(false);
+  const [term, setTerm] = useState(false);
+  const [termError, setTermError] = useState(false);
+
+  const { signUpLoading, signUpDone, signUpError, me } = useSelector(
+    (state) => state.user
+  );
+
+  useEffect(() => {
+    if (me && me.id) {
+      Router.replace("/");  //뒤로가기시 전페이지가 나오지않음
+    }
+  }, [me && me.id]);
+
+  useEffect(() => {
+    if (signUpDone) {
+      Router.push("/");
+    }
+  }, [signUpDone]);
+
+  useEffect(() => {
+    if (signUpError) {
+      alert(signUpError);
+    }
+  }, [signUpError]);
+
   const dispatch = useDispatch();
-  const { signUpLoading } = useSelector(state => state.user);
+
   const onChangePasswordCheck = useCallback(
-    e => {
+    (e) => {
       setPasswordCheck(e.target.value);
       setPasswordError(e.target.value !== password);
     },
     [password]
   );
 
-  const [term, setTerm] = useState(false);
-  const [termError, setTermError] = useState(false);
-  const onChangeTerm = useCallback(e => {
+  const onChangeTerm = useCallback((e) => {
     setTerm(e.target.checked);
     setTermError(false);
   }, []);
@@ -43,7 +67,10 @@ const Signup = () => {
     }
 
     console.log(email, nickName, password);
-    dispatch({ type: SIGNUP_REQUEST, data: { email, nickName, password } });
+    dispatch({
+      type: SIGNUP_REQUEST,
+      data: { email, nickName, password },
+    });
   }, [password, passwordCheck, term]);
 
   return (
