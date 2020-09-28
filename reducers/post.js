@@ -18,34 +18,34 @@ export const initialState = {
   removePostError: null,
   addCommentLoading: false,
   addCommentDone: false,
-  addCommentError: null
+  addCommentError: null,
 };
 
-export const generateDummyPost = number =>
+export const generateDummyPost = (number) =>
   Array(number)
     .fill()
     .map(() => ({
       id: shortid.generate(),
       User: {
         id: shortid.generate(),
-        nickname: faker.name.findName()
+        nickname: faker.name.findName(),
       },
       content: faker.lorem.paragraph(),
       Images: [
         {
           id: shortid.generate(),
-          src: faker.image.image()
-        }
+          src: faker.image.image(),
+        },
       ],
       Comments: [
         {
           User: {
             id: shortid.generate(),
-            nickname: faker.name.findName()
+            nickname: faker.name.findName(),
           },
-          content: faker.lorem.sentence()
-        }
-      ]
+          content: faker.lorem.sentence(),
+        },
+      ],
     }));
 
 export const LOAD_POSTS_REQUEST = "LOAD_POSTS_REQUEST";
@@ -64,36 +64,19 @@ export const ADD_COMMENT_REQUEST = "ADD_COMMENT_REQUEST";
 export const ADD_COMMENT_SUCCESS = "ADD_COMMENT_SUCCESS";
 export const ADD_COMMENT_FAILURE = "ADD_COMMENT_FAILURE";
 
-export const addPost = data => ({ type: ADD_POST_REQUEST, data });
+export const addPost = (data) => ({
+  type: ADD_POST_REQUEST,
+  data,
+});
 
-export const addComment = data => ({
+export const addComment = (data) => ({
   type: ADD_COMMENT_REQUEST,
-  data
-});
-
-const dummyPost = data => ({
-  id: data.id,
-  User: {
-    id: 1,
-    nickname: "yzzzzun"
-  },
-  content: data.content,
-  Images: [],
-  Comments: []
-});
-
-const dummyComment = data => ({
-  id: shortid.generate(),
-  content: data,
-  User: {
-    id: 1,
-    nickname: "yzzzzun"
-  }
+  data,
 });
 
 //이전 상태를 액션을 통해 다음상태로 만들어내는 함수(불변성은 지키면서)
 const reducer = (state = initialState, action) => {
-  return produce(state, draft => {
+  return produce(state, (draft) => {
     switch (action.type) {
       case ADD_POST_REQUEST:
         draft.addPostLoading = true;
@@ -101,7 +84,7 @@ const reducer = (state = initialState, action) => {
         draft.addPostError = null;
         break;
       case ADD_POST_SUCCESS:
-        draft.mainPosts.unshift(dummyPost(action.data));
+        draft.mainPosts.unshift(action.data);
         draft.addPostLoading = false;
         draft.addPostDone = true;
         break;
@@ -130,7 +113,7 @@ const reducer = (state = initialState, action) => {
         draft.removePostError = null;
         break;
       case REMOVE_POST_SUCCESS:
-        draft.mainPosts = draft.mainPosts.filter(v => v.id !== action.data);
+        draft.mainPosts = draft.mainPosts.filter((v) => v.id !== action.data);
         draft.removePostLoading = false;
         draft.removePostDone = true;
         break;
@@ -159,8 +142,8 @@ const reducer = (state = initialState, action) => {
         //   addCommentLoading : false,
         //   addCommentDone:true,
         // }
-        const post = draft.mainPosts.find(v => v.id === action.data.postId);
-        post.Comments.unshift(dummyComment(action.data.content));
+        const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+        post.Comments.unshift(action.data.content);
         draft.addCommentLoading = false;
         draft.addCommentDone = true;
         break;

@@ -4,11 +4,10 @@ import {
   all,
   fork,
   takeLatest,
-  actionChannel,
-  throttle
+  throttle,
+  call,
 } from "redux-saga/effects";
 import axios from "axios";
-import shortid from "shortid";
 
 import {
   ADD_COMMENT_FAILURE,
@@ -23,49 +22,50 @@ import {
   LOAD_POSTS_REQUEST,
   LOAD_POSTS_SUCCESS,
   LOAD_POSTS_FAILURE,
-  generateDummyPost
+  generateDummyPost,
 } from "../reducers/post";
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from "../reducers/user";
 
 //yield를 붙이는 이유는 테스트하기 편해서!!
 
+//실제 서버 요청
 function addPostAPI(data) {
-  //실제 서버 요청
-  return axios.post("/api/post", data);
+  console.log("posts api call");
+  return axios.post("/posts", { content: data });
 }
 
 function addCommentAPI(data) {
-  return axios.post("/api/comment", data);
+  return axios.post(`/posts/${data.postId}/comment`, data);
 }
 
 function removePostAPI(data) {
-  return axios.delete("/api/post", data);
+  return axios.delete("/posts", data);
 }
 
 function loadPostAPI() {
-  return axios.get("/api/post");
+  return axios.get("/posts");
 }
 
 function* addPost(action) {
   try {
-    // const result = yield call(addPostAPI);
-    yield delay(1000);
-    const id = shortid.generate();
+    console.log("add post saga function");
+    console.log(action);
+    const result = yield call(addPostAPI, action.data);
     yield put({
       type: ADD_POST_SUCCESS,
-      data: { id: id, content: action.data }
+      data: result.data,
     });
     //saga는 돋시에 여러 action을 dispatch 할 수 있다.
-    yield put({ type: ADD_POST_TO_ME, data: id });
+    yield put({ type: ADD_POST_TO_ME, data: result.data.id });
   } catch (error) {
+    console.log(error);
     yield put({ type: ADD_POST_FAILURE, data: error.response.data });
   }
 }
 
 function* addComment(action) {
   try {
-    //const result = yield call(addCOmmentAPI);
-    yield delay(1000);
+    const result = yield call(addCommentAPI);
     yield put({ type: ADD_COMMENT_SUCCESS, data: action.data });
   } catch (error) {
     yield put({ type: ADD_COMMENT_FAILURE, data: error.resposne.data });
@@ -77,11 +77,11 @@ function* removePost(action) {
     yield delay(1000);
     yield put({
       type: REMOVE_POST_SUCCESS,
-      data: action.data
+      data: action.data,
     });
     yield put({
       type: REMOVE_POST_OF_ME,
-      data: action.data
+      data: action.data,
     });
   } catch (error) {
     yield put({ type: REMOVE_POST_FAILURE, data: error.response.data });
@@ -93,10 +93,10 @@ function* loadPost(action) {
     yield delay(1000);
     yield put({
       type: LOAD_POSTS_SUCCESS,
-      data: generateDummyPost(10)
+      data: generateDummyPost(10),
     });
   } catch (error) {
-    console.log("error error");
+    console.log(error);
     yield put({ type: LOAD_POSTS_FAILURE, data: error.response.data });
   }
 }
@@ -121,6 +121,6 @@ export default function* postSaga() {
     fork(watchAddPost),
     fork(watchAddComment),
     fork(watchRemovePost),
-    fork(watchLoadPost)
+    fork(watchLoadPost),
   ]);
 }

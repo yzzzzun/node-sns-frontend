@@ -2,6 +2,9 @@ import produce from "immer";
 
 /** 변경중, 완료, 오류 */
 export const initialState = {
+  loadUserLoading: false,
+  loadUserDone: false,
+  loadUserError: null,
   logInLoading: false,
   logInDone: false,
   logInError: false,
@@ -22,7 +25,7 @@ export const initialState = {
   unFollowError: null,
   me: null,
   signUpData: {},
-  loginData: {}
+  loginData: {},
 };
 
 export const LOG_IN_REQUEST = "LOG_IN_REQUEST";
@@ -52,20 +55,24 @@ export const UNFOLLOW_FAILURE = "UNFOLLOW_FAILURE";
 export const ADD_POST_TO_ME = "ADD_POST_TO_ME";
 export const REMOVE_POST_OF_ME = "REMOVE_POST_OF_ME";
 
-export const loginRequest = data => {
+export const LOAD_USER_REQUEST = "LOAD_USER_REQUEST";
+export const LOAD_USER_SUCCESS = "LOAD_USER_SUCCESS";
+export const LOAD_USER_FAILURE = "LOAD_USER_FAILURE";
+
+export const loginRequest = (data) => {
   console.log("reducer login");
   return {
     type: LOG_IN_REQUEST,
-    data
+    data,
   };
 };
 
 export const logoutRequest = () => {
   return {
-    type: LOG_OUT_REQUEST
+    type: LOG_OUT_REQUEST,
   };
 };
-const dummyUser = data => ({
+const dummyUser = (data) => ({
   ...data,
   nickname: "yzzzzun",
   id: 1,
@@ -73,16 +80,16 @@ const dummyUser = data => ({
   Followings: [
     { nickname: "araru" },
     { nickname: "아라루" },
-    { nickname: "tams" }
+    { nickname: "tams" },
   ],
   Followers: [
     { nickname: "araru" },
     { nickname: "아라루" },
-    { nickname: "tams" }
-  ]
+    { nickname: "tams" },
+  ],
 });
 const reducer = (state = initialState, action) => {
-  return produce(state, draft => {
+  return produce(state, (draft) => {
     switch (action.type) {
       case FOLLOW_REQUEST:
         draft.followLoading = true;
@@ -98,6 +105,20 @@ const reducer = (state = initialState, action) => {
         draft.followLoading = false;
         draft.followError = action.error;
         break;
+      case LOAD_USER_REQUEST:
+        draft.loadUserLoading = true;
+        draft.loadUserDone = false;
+        draft.loadUserError = null;
+        break;
+      case LOAD_USER_SUCCESS:
+        draft.loadUserLoading = false;
+        draft.loadUserDone = true;
+        draft.me = action.data;
+        break;
+      case LOAD_USER_FAILURE:
+        draft.loadUserLoading = false;
+        draft.loadUserError = action.error;
+        break;
       case UNFOLLOW_REQUEST:
         draft.unFollowLoading = true;
         draft.unFollowDone = false;
@@ -107,7 +128,7 @@ const reducer = (state = initialState, action) => {
         draft.unFollowLoading = false;
         draft.unFollowDone = true;
         draft.me.Followings = draft.me.Followings.filter(
-          v => v.id !== action.data
+          (v) => v.id !== action.data
         );
         break;
       case UNFOLLOW_FAILURE:
@@ -173,7 +194,7 @@ const reducer = (state = initialState, action) => {
         draft.me.Posts.unshift({ id: action.data });
         break;
       case REMOVE_POST_OF_ME:
-        const index = draft.me.Posts.find(v => v.id === action.data);
+        const index = draft.me.Posts.find((v) => v.id === action.data);
         draft.me.Posts.splice(index, 1);
         // draft.me.Posts = draft.me.Posts.filter((v) => v.id !== action.data);
         break;

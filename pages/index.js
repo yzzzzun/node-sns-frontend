@@ -5,16 +5,21 @@ import { useSelector, useDispatch } from "react-redux";
 import PostForm from "../components/PostForm";
 import PostCard from "../components/PostCard";
 import { LOAD_POSTS_REQUEST } from "../reducers/post";
+import { LOAD_USER_REQUEST } from "../reducers/user";
 
 const Home = () => {
   const dispatch = useDispatch();
-  const { me } = useSelector(state => state.user);
+  const { me } = useSelector((state) => state.user);
   const { mainPosts, hasMorePosts, loadPostLoading } = useSelector(
-    state => state.post
+    (state) => state.post
   );
   useEffect(() => {
     dispatch({
-      type: LOAD_POSTS_REQUEST
+      type: LOAD_POSTS_REQUEST,
+    });
+
+    dispatch({
+      type: LOAD_USER_REQUEST,
     });
   }, []);
 
@@ -33,7 +38,7 @@ const Home = () => {
         console.log(hasMorePosts);
         if (hasMorePosts && !loadPostLoading) {
           dispatch({
-            type: LOAD_POSTS_REQUEST
+            type: LOAD_POSTS_REQUEST,
           });
         }
       }
@@ -48,7 +53,7 @@ const Home = () => {
   return (
     <AppLayout>
       {me && <PostForm />}
-      {mainPosts.map(post => (
+      {mainPosts.map((post) => (
         <PostCard key={post.id} post={post} />
       ))}
     </AppLayout>
